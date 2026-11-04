@@ -24,4 +24,9 @@ class Assunto extends Model
             'Livro_Codl'
         );
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'codAs';
+    }
 }

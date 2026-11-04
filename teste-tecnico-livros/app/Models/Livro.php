@@ -38,4 +38,9 @@ class Livro extends Model
             'Assunto_codAs'
         );
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'Codl';
+    }
 }

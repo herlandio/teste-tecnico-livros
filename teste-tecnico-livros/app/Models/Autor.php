@@ -24,4 +24,9 @@ class Autor extends Model
             'Livro_Codl'
         );
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'CodAu';
+    }
 }
