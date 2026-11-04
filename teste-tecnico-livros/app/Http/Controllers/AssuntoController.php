@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\FalhaNaOperacaoException;
 use App\Models\Assunto;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
@@ -38,9 +39,11 @@ class AssuntoController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Não foi possível cadastrar o assunto.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível cadastrar o assunto.',
+                true,
+                $e
+            );
         }
     }
 
@@ -72,9 +75,11 @@ class AssuntoController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Não foi possível atualizar o assunto.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível atualizar o assunto.',
+                true,
+                $e
+            );
         }
     }
 
@@ -90,8 +95,11 @@ class AssuntoController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->with('error', 'Não foi possível excluir o assunto.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível excluir o assunto.',
+                false,
+                $e
+            );
         }
     }
 }

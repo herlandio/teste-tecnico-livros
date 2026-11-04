@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\FalhaNaOperacaoException;
 use App\Models\Autor;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
@@ -38,9 +39,11 @@ class AutorController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Não foi possível cadastrar o autor.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível cadastrar o autor.',
+                true,
+                $e
+            );
         }
     }
 
@@ -72,9 +75,11 @@ class AutorController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Não foi possível atualizar o autor.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível atualizar o autor.',
+                true,
+                $e
+            );
         }
     }
 
@@ -90,8 +95,11 @@ class AutorController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->with('error', 'Não foi possível excluir o autor.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível excluir o autor.',
+                false,
+                $e
+            );
         }
     }
 }

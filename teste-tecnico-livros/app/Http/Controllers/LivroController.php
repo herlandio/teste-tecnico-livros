@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\FalhaNaOperacaoException;
 use App\Models\Livro;
 use App\Models\Autor;
 use App\Models\Assunto;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class LivroController extends Controller
 {
@@ -64,9 +64,11 @@ class LivroController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Não foi possível cadastrar o livro.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível cadastrar o livro.',
+                true,
+                $e
+            );
         }
     }
 
@@ -122,9 +124,11 @@ class LivroController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Não foi possível atualizar o livro.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível atualizar o livro.',
+                true,
+                $e
+            );
         }
     }
 
@@ -140,8 +144,11 @@ class LivroController extends Controller
         } catch (QueryException $e) {
             report($e);
 
-            return back()
-                ->with('error', 'Não foi possível excluir o livro.');
+            throw new FalhaNaOperacaoException(
+                'Não foi possível excluir o livro.',
+                false,
+                $e
+            );
         }
     }
 }
