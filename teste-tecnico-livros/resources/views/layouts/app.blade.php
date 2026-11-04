@@ -10,7 +10,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -48,7 +48,7 @@
         </div>
     </nav>
 
-    <main class="container py-4">
+    <main class="container py-4 flex-grow-1">
 
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -81,7 +81,7 @@
 
     </main>
 
-    <footer class="border-top bg-white py-3 mt-5">
+    <footer class="border-top bg-white py-3 mt-auto">
         <div class="container text-center text-muted small">
             Sistema de Cadastro de Livros — Desafio Técnico
         </div>
