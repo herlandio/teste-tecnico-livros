@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use RuntimeException;
+use Throwable;
 
 class FalhaNaOperacaoException extends RuntimeException
 {
