@@ -43,6 +43,11 @@
                             Assuntos
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('relatorios.livros-por-autor') }}">
+                            <i class="bi bi-file-earmark-bar-graph"></i> Relatórios
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
