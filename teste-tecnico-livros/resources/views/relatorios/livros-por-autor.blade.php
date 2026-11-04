@@ -12,9 +12,18 @@
         </p>
     </div>
 
-    <button onclick="window.print()" class="btn btn-outline-primary">
-        <i class="bi bi-printer"></i> Imprimir
-    </button>
+    <div class="d-flex gap-2">
+        <a
+            href="{{ route('relatorios.livros-por-autor.pdf') }}"
+            class="btn btn-danger"
+        >
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </a>
+
+        <button onclick="window.print()" class="btn btn-outline-primary">
+            <i class="bi bi-printer"></i> Imprimir
+        </button>
+    </div>
 </div>
 
 @forelse ($autores as $livros)

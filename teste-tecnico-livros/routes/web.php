@@ -17,3 +17,7 @@ Route::get(
     '/relatorios/livros-por-autor',
     [RelatorioController::class, 'livrosPorAutor']
 )->name('relatorios.livros-por-autor');
+Route::get(
+    '/relatorios/livros-por-autor/pdf',
+    [RelatorioController::class, 'livrosPorAutorPdf']
+)->name('relatorios.livros-por-autor.pdf');
