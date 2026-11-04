@@ -90,4 +90,53 @@ class LivroCrudTest extends TestCase
         $response->assertSee('Dom Casmurro');
         $response->assertSee('Literatura');
     }
+
+    public function test_usuario_pode_atualizar_um_livro(): void
+    {
+        $livro = Livro::create([
+            'Titulo' => 'Título antigo',
+            'Editora' => 'Editora antiga',
+            'Edicao' => 1,
+            'AnoPublicacao' => '2020',
+            'Valor' => 30.00,
+        ]);
+
+        $response = $this->put(route('livros.update', $livro), [
+            'Titulo' => 'Título atualizado',
+            'Editora' => 'Nova editora',
+            'Edicao' => 2,
+            'AnoPublicacao' => '2025',
+            'Valor' => '59.90',
+            'autores' => [],
+            'assuntos' => [],
+        ]);
+
+        $response->assertRedirect(route('livros.index'));
+
+        $this->assertDatabaseHas('livro', [
+            'Codl' => $livro->Codl,
+            'Titulo' => 'Título atualizado',
+            'Editora' => 'Nova editora',
+            'Valor' => '59.90',
+        ]);
+    }
+
+    public function test_usuario_pode_excluir_um_livro(): void
+    {
+        $livro = Livro::create([
+            'Titulo' => 'Livro para excluir',
+            'Editora' => 'Editora Exemplo',
+            'Edicao' => 1,
+            'AnoPublicacao' => '2020',
+            'Valor' => 40.00,
+        ]);
+
+        $response = $this->delete(route('livros.destroy', $livro));
+
+        $response->assertRedirect(route('livros.index'));
+
+        $this->assertDatabaseMissing('livro', [
+            'Codl' => $livro->Codl,
+        ]);
+    }
 }

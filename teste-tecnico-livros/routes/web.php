@@ -11,8 +11,10 @@ Route::get('/', function () {
 });
 
 Route::resource('livros', LivroController::class);
-Route::resource('autores', AutorController::class);
-Route::resource('assuntos', AssuntoController::class);
+Route::resource('autores', AutorController::class)
+    ->parameters(['autores' => 'autor']);
+Route::resource('assuntos', AssuntoController::class)
+    ->parameters(['assuntos' => 'assunto']);
 Route::get(
     '/relatorios/livros-por-autor',
     [RelatorioController::class, 'livrosPorAutor']
