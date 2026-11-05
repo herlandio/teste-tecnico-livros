@@ -45,7 +45,11 @@
                     <input type="number" name="Edicao"
                            class="form-control"
                            min="1"
+                           step="1"
+                           inputmode="numeric"
+                           data-numeric="inteiro"
                            value="{{ old('Edicao', $livro->Edicao) }}">
+                    <div class="invalid-feedback" data-feedback></div>
                 </div>
 
                 <div class="col-md-4">
@@ -55,17 +59,24 @@
                            maxlength="4"
                            inputmode="numeric"
                            pattern="[0-9]{4}"
+                           placeholder="AAAA"
+                           data-mask="ano"
                            value="{{ old('AnoPublicacao', $livro->AnoPublicacao) }}">
+                    <small class="text-muted" data-ano-hint>Entre 1000 e o ano atual.</small>
+                    <div class="invalid-feedback" data-feedback></div>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Valor (R$) *</label>
-                    <input type="number" name="Valor"
+                    <input type="text" name="Valor"
                            class="form-control"
-                           min="0"
-                           step="0.01"
+                           inputmode="decimal"
+                           placeholder="0,00"
+                           autocomplete="off"
+                           data-mask="moeda"
                            value="{{ old('Valor', $livro->Valor) }}"
                            required>
+                    <div class="invalid-feedback" data-feedback></div>
                 </div>
 
                 <div class="col-md-6">
