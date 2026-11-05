@@ -2,153 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\FalhaNaOperacaoException;
+use App\Http\Requests\LivroRequest;
 use App\Models\Livro;
-use App\Models\Autor;
-use App\Models\Assunto;
-use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
+use App\Services\Contracts\LivroServiceInterface;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 
 class LivroController extends Controller
 {
-    public function index()
-    {
-        $livros = Livro::with(['autores', 'assuntos'])
-            ->orderBy('Titulo')
-            ->paginate(10);
+    public function __construct(
+        private readonly LivroServiceInterface $livroService,
+    ) {}
 
-        return view('livros.index', compact('livros'));
+    public function index(): Response
+    {
+        return response()->view('livros.index', [
+            'livros' => $this->livroService->listar(),
+        ], Response::HTTP_OK);
     }
 
-    public function create()
+    public function create(): Response
     {
-        $autores = Autor::orderBy('Nome')->get();
-        $assuntos = Assunto::orderBy('Descricao')->get();
-
-        return view('livros.create', compact('autores', 'assuntos'));
+        return response()->view('livros.create', [
+            'autores' => $this->livroService->listarAutores(),
+            'assuntos' => $this->livroService->listarAssuntos(),
+        ], Response::HTTP_OK);
     }
 
-    public function store(Request $request)
+    public function store(LivroRequest $request): RedirectResponse
     {
-        $dados = $request->validate([
-            'Titulo' => ['required', 'string', 'max:40'],
-            'Editora' => ['nullable', 'string', 'max:40'],
-            'Edicao' => ['nullable', 'integer', 'min:1'],
-            'AnoPublicacao' => ['nullable', 'digits:4'],
-            'Valor' => ['required', 'numeric', 'min:0'],
-            'autores' => ['nullable', 'array'],
-            'autores.*' => ['integer', 'exists:autor,CodAu'],
-            'assuntos' => ['nullable', 'array'],
-            'assuntos.*' => ['integer', 'exists:assunto,codAs'],
-        ]);
+        $this->livroService->criar($request->validated());
 
-        try {
-            DB::transaction(function () use ($dados) {
-                $livro = Livro::create([
-                    'Titulo' => $dados['Titulo'],
-                    'Editora' => $dados['Editora'] ?? null,
-                    'Edicao' => $dados['Edicao'] ?? null,
-                    'AnoPublicacao' => $dados['AnoPublicacao'] ?? null,
-                    'Valor' => $dados['Valor'],
-                ]);
-
-                $livro->autores()->sync($dados['autores'] ?? []);
-                $livro->assuntos()->sync($dados['assuntos'] ?? []);
-            });
-
-            return redirect()
-                ->route('livros.index')
-                ->with('success', 'Livro cadastrado com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível cadastrar o livro.',
-                true,
-                $e
-            );
-        }
+        return redirect()
+            ->route('livros.index')
+            ->with('success', 'Livro cadastrado com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
-    public function show(Livro $livro)
+    public function show(Livro $livro): Response
     {
-        $livro->load(['autores', 'assuntos']);
-
-        return view('livros.show', compact('livro'));
+        return response()->view('livros.show', [
+            'livro' => $this->livroService->detalhar($livro),
+        ], Response::HTTP_OK);
     }
 
-    public function edit(Livro $livro)
+    public function edit(Livro $livro): Response
     {
-        $livro->load(['autores', 'assuntos']);
-
-        $autores = Autor::orderBy('Nome')->get();
-        $assuntos = Assunto::orderBy('Descricao')->get();
-
-        return view('livros.edit', compact('livro', 'autores', 'assuntos'));
+        return response()->view('livros.edit', [
+            'livro' => $this->livroService->detalhar($livro),
+            'autores' => $this->livroService->listarAutores(),
+            'assuntos' => $this->livroService->listarAssuntos(),
+        ], Response::HTTP_OK);
     }
 
-    public function update(Request $request, Livro $livro)
+    public function update(LivroRequest $request, Livro $livro): RedirectResponse
     {
-        $dados = $request->validate([
-            'Titulo' => ['required', 'string', 'max:40'],
-            'Editora' => ['nullable', 'string', 'max:40'],
-            'Edicao' => ['nullable', 'integer', 'min:1'],
-            'AnoPublicacao' => ['nullable', 'digits:4'],
-            'Valor' => ['required', 'numeric', 'min:0'],
-            'autores' => ['nullable', 'array'],
-            'autores.*' => ['integer', 'exists:autor,CodAu'],
-            'assuntos' => ['nullable', 'array'],
-            'assuntos.*' => ['integer', 'exists:assunto,codAs'],
-        ]);
+        $this->livroService->atualizar($livro, $request->validated());
 
-        try {
-            DB::transaction(function () use ($dados, $livro) {
-                $livro->update([
-                    'Titulo' => $dados['Titulo'],
-                    'Editora' => $dados['Editora'] ?? null,
-                    'Edicao' => $dados['Edicao'] ?? null,
-                    'AnoPublicacao' => $dados['AnoPublicacao'] ?? null,
-                    'Valor' => $dados['Valor'],
-                ]);
-
-                $livro->autores()->sync($dados['autores'] ?? []);
-                $livro->assuntos()->sync($dados['assuntos'] ?? []);
-            });
-
-            return redirect()
-                ->route('livros.index')
-                ->with('success', 'Livro atualizado com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível atualizar o livro.',
-                true,
-                $e
-            );
-        }
+        return redirect()
+            ->route('livros.index')
+            ->with('success', 'Livro atualizado com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
-    public function destroy(Livro $livro)
+    public function destroy(Livro $livro): RedirectResponse
     {
-        try {
-            $livro->delete();
+        $this->livroService->excluir($livro);
 
-            return redirect()
-                ->route('livros.index')
-                ->with('success', 'Livro excluído com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível excluir o livro.',
-                false,
-                $e
-            );
-        }
+        return redirect()
+            ->route('livros.index')
+            ->with('success', 'Livro excluído com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 }

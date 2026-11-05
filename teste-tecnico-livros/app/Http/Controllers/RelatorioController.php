@@ -2,39 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\Contracts\RelatorioServiceInterface;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RelatorioController extends Controller
 {
-    public function livrosPorAutor()
+    public function __construct(
+        private readonly RelatorioServiceInterface $relatorioService,
+    ) {}
+
+    public function livrosPorAutor(): Response
     {
-        $registros = DB::table('vw_livros_por_autor')
-            ->orderBy('autor_nome')
-            ->orderBy('livro_titulo')
-            ->get();
-
-        $autores = $registros->groupBy('autor_id');
-
-        return view('relatorios.livros-por-autor', compact('autores'));
+        return response()->view('relatorios.livros-por-autor', [
+            'autores' => $this->relatorioService->livrosAgrupadosPorAutor(),
+        ], Response::HTTP_OK);
     }
 
-    public function livrosPorAutorPdf()
+    public function livrosPorAutorPdf(): SymfonyResponse
     {
-        $registros = DB::table('vw_livros_por_autor')
-            ->orderBy('autor_nome')
-            ->orderBy('livro_titulo')
-            ->get();
-
-        $autores = $registros->groupBy('autor_id');
-
-        $pdf = Pdf::loadView(
-            'relatorios.livros-por-autor-pdf',
-            compact('autores')
-        );
-
-        $pdf->setPaper('a4', 'landscape');
-
-        return $pdf->download('relatorio-livros-por-autor.pdf');
+        return $this->relatorioService->exportarPdf();
     }
 }

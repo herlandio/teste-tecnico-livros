@@ -1,14 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LivroController;
-use App\Http\Controllers\AutorController;
 use App\Http\Controllers\AssuntoController;
+use App\Http\Controllers\AutorController;
+use App\Http\Controllers\LivroController;
 use App\Http\Controllers\RelatorioController;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('livros.index');
-});
+Route::redirect('/', '/livros', Response::HTTP_FOUND);
 
 Route::resource('livros', LivroController::class);
 Route::resource('autores', AutorController::class)

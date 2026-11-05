@@ -2,104 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\FalhaNaOperacaoException;
+use App\Http\Requests\AutorRequest;
 use App\Models\Autor;
-use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
+use App\Services\Contracts\AutorServiceInterface;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 
 class AutorController extends Controller
 {
-    public function index()
-    {
-        $autores = Autor::withCount('livros')
-            ->orderBy('Nome')
-            ->paginate(10);
+    public function __construct(
+        private readonly AutorServiceInterface $autorService,
+    ) {}
 
-        return view('autores.index', compact('autores'));
+    public function index(): Response
+    {
+        return response()->view('autores.index', [
+            'autores' => $this->autorService->listar(),
+        ], Response::HTTP_OK);
     }
 
-    public function create()
+    public function create(): Response
     {
-        return view('autores.create');
+        return response()->view('autores.create', [], Response::HTTP_OK);
     }
 
-    public function store(Request $request)
+    public function store(AutorRequest $request): RedirectResponse
     {
-        $dados = $request->validate([
-            'Nome' => ['required', 'string', 'max:40'],
-        ]);
+        $this->autorService->criar($request->validated());
 
-        try {
-            Autor::create($dados);
-
-            return redirect()
-                ->route('autores.index')
-                ->with('success', 'Autor cadastrado com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível cadastrar o autor.',
-                true,
-                $e
-            );
-        }
+        return redirect()
+            ->route('autores.index')
+            ->with('success', 'Autor cadastrado com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
-    public function show(Autor $autor)
+    public function show(Autor $autor): Response
     {
-        $autor->load('livros');
-
-        return view('autores.show', compact('autor'));
+        return response()->view('autores.show', [
+            'autor' => $this->autorService->detalhar($autor),
+        ], Response::HTTP_OK);
     }
 
-    public function edit(Autor $autor)
+    public function edit(Autor $autor): Response
     {
-        return view('autores.edit', compact('autor'));
+        return response()->view('autores.edit', [
+            'autor' => $autor,
+        ], Response::HTTP_OK);
     }
 
-    public function update(Request $request, Autor $autor)
+    public function update(AutorRequest $request, Autor $autor): RedirectResponse
     {
-        $dados = $request->validate([
-            'Nome' => ['required', 'string', 'max:40'],
-        ]);
+        $this->autorService->atualizar($autor, $request->validated());
 
-        try {
-            $autor->update($dados);
-
-            return redirect()
-                ->route('autores.index')
-                ->with('success', 'Autor atualizado com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível atualizar o autor.',
-                true,
-                $e
-            );
-        }
+        return redirect()
+            ->route('autores.index')
+            ->with('success', 'Autor atualizado com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
-    public function destroy(Autor $autor)
+    public function destroy(Autor $autor): RedirectResponse
     {
-        try {
-            $autor->delete();
+        $this->autorService->excluir($autor);
 
-            return redirect()
-                ->route('autores.index')
-                ->with('success', 'Autor excluído com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível excluir o autor.',
-                false,
-                $e
-            );
-        }
+        return redirect()
+            ->route('autores.index')
+            ->with('success', 'Autor excluído com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 }

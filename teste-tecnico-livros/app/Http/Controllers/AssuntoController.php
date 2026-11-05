@@ -2,104 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\FalhaNaOperacaoException;
+use App\Http\Requests\AssuntoRequest;
 use App\Models\Assunto;
-use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
+use App\Services\Contracts\AssuntoServiceInterface;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 
 class AssuntoController extends Controller
 {
-    public function index()
-    {
-        $assuntos = Assunto::withCount('livros')
-            ->orderBy('Descricao')
-            ->paginate(10);
+    public function __construct(
+        private readonly AssuntoServiceInterface $assuntoService,
+    ) {}
 
-        return view('assuntos.index', compact('assuntos'));
+    public function index(): Response
+    {
+        return response()->view('assuntos.index', [
+            'assuntos' => $this->assuntoService->listar(),
+        ], Response::HTTP_OK);
     }
 
-    public function create()
+    public function create(): Response
     {
-        return view('assuntos.create');
+        return response()->view('assuntos.create', [], Response::HTTP_OK);
     }
 
-    public function store(Request $request)
+    public function store(AssuntoRequest $request): RedirectResponse
     {
-        $dados = $request->validate([
-            'Descricao' => ['required', 'string', 'max:20'],
-        ]);
+        $this->assuntoService->criar($request->validated());
 
-        try {
-            Assunto::create($dados);
-
-            return redirect()
-                ->route('assuntos.index')
-                ->with('success', 'Assunto cadastrado com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível cadastrar o assunto.',
-                true,
-                $e
-            );
-        }
+        return redirect()
+            ->route('assuntos.index')
+            ->with('success', 'Assunto cadastrado com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
-    public function show(Assunto $assunto)
+    public function show(Assunto $assunto): Response
     {
-        $assunto->load('livros');
-
-        return view('assuntos.show', compact('assunto'));
+        return response()->view('assuntos.show', [
+            'assunto' => $this->assuntoService->detalhar($assunto),
+        ], Response::HTTP_OK);
     }
 
-    public function edit(Assunto $assunto)
+    public function edit(Assunto $assunto): Response
     {
-        return view('assuntos.edit', compact('assunto'));
+        return response()->view('assuntos.edit', [
+            'assunto' => $assunto,
+        ], Response::HTTP_OK);
     }
 
-    public function update(Request $request, Assunto $assunto)
+    public function update(AssuntoRequest $request, Assunto $assunto): RedirectResponse
     {
-        $dados = $request->validate([
-            'Descricao' => ['required', 'string', 'max:20'],
-        ]);
+        $this->assuntoService->atualizar($assunto, $request->validated());
 
-        try {
-            $assunto->update($dados);
-
-            return redirect()
-                ->route('assuntos.index')
-                ->with('success', 'Assunto atualizado com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível atualizar o assunto.',
-                true,
-                $e
-            );
-        }
+        return redirect()
+            ->route('assuntos.index')
+            ->with('success', 'Assunto atualizado com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
-    public function destroy(Assunto $assunto)
+    public function destroy(Assunto $assunto): RedirectResponse
     {
-        try {
-            $assunto->delete();
+        $this->assuntoService->excluir($assunto);
 
-            return redirect()
-                ->route('assuntos.index')
-                ->with('success', 'Assunto excluído com sucesso.');
-
-        } catch (QueryException $e) {
-            report($e);
-
-            throw new FalhaNaOperacaoException(
-                'Não foi possível excluir o assunto.',
-                false,
-                $e
-            );
-        }
+        return redirect()
+            ->route('assuntos.index')
+            ->with('success', 'Assunto excluído com sucesso.')
+            ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 }
