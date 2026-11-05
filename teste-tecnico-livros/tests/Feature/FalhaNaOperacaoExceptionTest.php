@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exceptions\FalhaNaOperacaoException;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use RuntimeException;
 use Tests\TestCase;
@@ -25,6 +26,7 @@ class FalhaNaOperacaoExceptionTest extends TestCase
             ]);
 
         $response
+            ->assertStatus(Response::HTTP_SEE_OTHER)
             ->assertRedirect('/formulario')
             ->assertSessionHas('error', 'Não foi possível salvar os dados.')
             ->assertSessionHas('_old_input.Titulo', 'Livro de teste');
@@ -46,9 +48,27 @@ class FalhaNaOperacaoExceptionTest extends TestCase
             ]);
 
         $response
+            ->assertStatus(Response::HTTP_SEE_OTHER)
             ->assertRedirect('/formulario')
             ->assertSessionHas('error', 'Não foi possível excluir o registro.')
             ->assertSessionMissing('_old_input.Titulo');
+    }
+
+    public function test_erro_de_operacao_retorna_500_para_json(): void
+    {
+        Route::middleware('web')->post('/_teste-excecao-json', function () {
+            throw new FalhaNaOperacaoException(
+                'Não foi possível salvar os dados.'
+            );
+        });
+
+        $response = $this->postJson('/_teste-excecao-json');
+
+        $response
+            ->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
+            ->assertJson([
+                'message' => 'Não foi possível salvar os dados.',
+            ]);
     }
 
     public function test_mantem_excecao_original_como_causa(): void
