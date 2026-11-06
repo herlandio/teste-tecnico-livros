@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Services\Contracts\RelatorioServiceInterface;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RelatorioController extends Controller
 {
@@ -19,7 +18,7 @@ class RelatorioController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function livrosPorAutorPdf(): SymfonyResponse
+    public function livrosPorAutorPdf(): Response
     {
         return $this->relatorioService->exportarPdf();
     }
