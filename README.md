@@ -1,8 +1,8 @@
 # Gerenciamento de Livros
 
-Projeto desenvolvido como parte de um desafio técnico. A aplicação permite cadastrar e gerenciar livros, autores e assuntos, além de consultar um relatório de livros agrupados por autor, com opção de exportação em PDF.
+Aplicação desenvolvida como parte de um desafio técnico, com o objetivo de gerenciar livros, autores e assuntos. O sistema conta com operações de cadastro, edição, consulta e exclusão, além de um relatório que reúne os livros por autor e permite a exportação em PDF.
 
-## Tecnologias
+## Tecnologias utilizadas
 
 - PHP 8.4
 - Laravel 12
@@ -14,43 +14,41 @@ Projeto desenvolvido como parte de um desafio técnico. A aplicação permite ca
 - DomPDF
 - Vite
 
-## Funcionalidades desenvolvidas
+## Funcionalidades
 
-- Cadastro, edição, consulta e exclusão de livros.
-- Cadastro, edição, consulta e exclusão de autores.
-- Cadastro, edição, consulta e exclusão de assuntos.
-- Associação de um livro a vários autores e assuntos.
-- Listagem dos registros com paginação.
-- Validação dos dados dos formulários.
-- Tratamento de erros nas operações com o banco de dados.
+- Cadastro, edição, consulta e exclusão de livros, autores e assuntos.
+- Associação de vários autores e assuntos a um mesmo livro.
+- Listagem de registros com paginação.
+- Validação dos dados informados nos formulários.
+- Tratamento de erros durante as operações com o banco de dados.
 - Relatório de livros agrupados por autor.
 - Exportação do relatório em PDF.
 - Formatação de valores monetários.
 
-## Banco de dados
+## Estrutura do banco de dados
 
-O modelo de dados utiliza as seguintes entidades:
+O banco de dados é composto por três entidades principais:
 
-- **Livro:** armazena os dados dos livros, incluindo título, editora, edição, ano de publicação e valor.
+- **Livro:** armazena informações como título, editora, edição, ano de publicação e valor.
 - **Autor:** armazena os nomes dos autores.
 - **Assunto:** armazena as descrições dos assuntos.
 
-Os relacionamentos entre livros e autores, e entre livros e assuntos, são muitos-para-muitos, implementados por meio das tabelas intermediárias `livro_autor` e `livro_assunto`.
+Um livro pode estar associado a vários autores e assuntos. Esses relacionamentos são representados pelas tabelas intermediárias `livro_autor` e `livro_assunto`.
 
-Foram utilizadas chaves estrangeiras e restrições de integridade referencial para manter a consistência dos dados.
+Também foram utilizadas chaves estrangeiras e restrições de integridade referencial para manter a consistência dos dados.
 
-O relatório utiliza a VIEW `vw_livros_por_autor` como fonte de consulta.
+Para gerar o relatório, foi criada a VIEW `vw_livros_por_autor`, utilizada como fonte das consultas.
 
-## Como executar
+## Como executar o projeto
 
-O projeto utiliza Docker Compose para executar a aplicação, o banco de dados PostgreSQL, o servidor Nginx e o Vite.
+A aplicação utiliza Docker Compose para facilitar a configuração e execução do ambiente, que inclui PHP, PostgreSQL, Nginx e Vite.
 
 ### Pré-requisitos
 
 - Docker Desktop
 - Git
 
-### 1. Clonar o projeto
+### 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/herlandio/teste-tecnico-livros.git
@@ -65,7 +63,7 @@ Copie o arquivo de configuração:
 cp .env.example .env
 ```
 
-Confira as configurações do banco de dados no arquivo `.env`:
+Confira se as configurações do banco de dados no arquivo `.env` estão corretas:
 
 ```env
 DB_CONNECTION=pgsql
@@ -102,28 +100,28 @@ docker compose exec app php artisan migrate
 
 ### 7. Acessar a aplicação
 
-Após concluir as etapas anteriores, acesse:
+Com o ambiente configurado, acesse:
 
-[http://localhost:8080](http://localhost:8080)
+http://localhost:8080
 
-O serviço Vite é iniciado pelo Docker Compose e disponibiliza os recursos de frontend durante a execução da aplicação.
+O Vite também é executado pelo Docker Compose, disponibilizando os recursos de frontend durante o desenvolvimento.
 
-## Relatório
+## Relatório de livros por autor
 
-O relatório pode ser acessado pelo menu da aplicação ou diretamente pelas URLs:
+O relatório pode ser acessado pelo menu da aplicação ou diretamente pelos seguintes endereços:
 
 - **HTML:** http://localhost:8080/relatorios/livros-por-autor
 - **PDF:** http://localhost:8080/relatorios/livros-por-autor/pdf
 
-Os dados são consultados por meio da VIEW `vw_livros_por_autor`, agrupando os livros por autor. Um mesmo livro pode aparecer em mais de um grupo quando possui múltiplos autores associados.
+Os dados são obtidos por meio da VIEW `vw_livros_por_autor` e organizados por autor. Quando um livro possui mais de um autor associado, ele aparece nos respectivos grupos do relatório.
 
 ## Testes automatizados
 
-Os testes foram implementados com PHPUnit e utilizam SQLite em memória, separado do PostgreSQL utilizado pela aplicação.
+Os testes foram desenvolvidos com PHPUnit e utilizam SQLite em memória, mantendo o ambiente de testes separado do PostgreSQL utilizado pela aplicação.
 
-Essa configuração permite executar os cenários de teste isoladamente, sem alterar os dados do banco principal.
+Dessa forma, os testes podem ser executados sem interferir nos dados do banco principal.
 
-Para executar todos os testes:
+Para executar:
 
 ```bash
 docker compose exec app php artisan test
