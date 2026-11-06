@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Pdf;
+namespace App\Services;
 
-use App\Contracts\RelatorioPdfInterface;
+use App\Services\Contracts\RelatorioPdfInterface;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;

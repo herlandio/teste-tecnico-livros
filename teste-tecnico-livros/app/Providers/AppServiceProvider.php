@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Contracts\RelatorioPdfInterface;
-use App\Infrastructure\Pdf\DomPdfRelatorioPdf;
+use App\Services\Contracts\RelatorioPdfInterface;
+use App\Services\DomPdfRelatorioPdf;
 use App\Services\AssuntoService;
 use App\Services\AutorService;
 use App\Services\Contracts\AssuntoServiceInterface;

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Contracts\RelatorioPdfInterface;
+use App\Services\Contracts\RelatorioPdfInterface;
 use App\Repositories\Contracts\RelatorioRepositoryInterface;
 use App\Services\Contracts\RelatorioServiceInterface;
 use Illuminate\Support\Collection;
