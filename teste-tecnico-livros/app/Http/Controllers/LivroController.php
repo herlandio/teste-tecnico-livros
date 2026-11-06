@@ -14,6 +14,11 @@ class LivroController extends Controller
         private readonly LivroServiceInterface $livroService,
     ) {}
 
+    /**
+     * Lista de livros
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(): Response
     {
         return response()->view('livros.index', [
@@ -21,6 +26,11 @@ class LivroController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Formulário de criação de livro
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function create(): Response
     {
         return response()->view('livros.create', [
@@ -29,6 +39,12 @@ class LivroController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Armazena um novo livro
+     *
+     * @param  \App\Http\Requests\LivroRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(LivroRequest $request): RedirectResponse
     {
         $this->livroService->criar($request->validated());
@@ -39,6 +55,12 @@ class LivroController extends Controller
             ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * Exibe os detalhes de um livro
+     *
+     * @param  \App\Models\Livro  $livro
+     * @return \Illuminate\Http\Response
+     */
     public function show(Livro $livro): Response
     {
         return response()->view('livros.show', [
@@ -46,6 +68,12 @@ class LivroController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Formulário de edição de livro
+     *
+     * @param  \App\Models\Livro  $livro
+     * @return \Illuminate\Http\Response
+     */
     public function edit(Livro $livro): Response
     {
         return response()->view('livros.edit', [
@@ -55,6 +83,13 @@ class LivroController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Atualiza um livro
+     *
+     * @param  \App\Http\Requests\LivroRequest  $request
+     * @param  \App\Models\Livro  $livro
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(LivroRequest $request, Livro $livro): RedirectResponse
     {
         $this->livroService->atualizar($livro, $request->validated());
@@ -65,6 +100,12 @@ class LivroController extends Controller
             ->setStatusCode(Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * Remove um livro
+     *
+     * @param  \App\Models\Livro  $livro
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Livro $livro): RedirectResponse
     {
         $this->livroService->excluir($livro);

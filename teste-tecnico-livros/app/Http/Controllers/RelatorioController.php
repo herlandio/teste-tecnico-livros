@@ -11,6 +11,11 @@ class RelatorioController extends Controller
         private readonly RelatorioServiceInterface $relatorioService,
     ) {}
 
+    /**
+     * Lista de livros agrupados por autor
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function livrosPorAutor(): Response
     {
         return response()->view('relatorios.livros-por-autor', [
@@ -18,6 +23,11 @@ class RelatorioController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * Exporta os livros agrupados por autor para PDF
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function livrosPorAutorPdf(): Response
     {
         return $this->relatorioService->exportarPdf();
