@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Services;
 
-use App\Contracts\RelatorioPdfInterface;
 use App\Repositories\Contracts\RelatorioRepositoryInterface;
+use App\Services\Contracts\RelatorioPdfInterface;
 use App\Services\RelatorioService;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\MockObject\MockObject;
